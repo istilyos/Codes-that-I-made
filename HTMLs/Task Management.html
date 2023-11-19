@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task Management Application</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css">
+
+    <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      background-color: cornsilk;
+      padding: 20px;
+      color: #333; /* Font color for body */
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      color: #0056b3; /* Font color for heading */
+      text-transform: uppercase;
+    }
+    label, input, button {
+      color: #333; /* Font color for labels, inputs, and buttons */
+      font-family: Arial, sans-serif;
+    }
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .modal-content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      color: #333; /* Font color for modals */
+      font-family: Arial, sans-serif;
+    }
+  </style>
+
+</head>
+<body>
+  <h1>Task Management ng Maaangas</h1>
+  <br>
+  
+    <label for="taskName">Task Name:</label>
+    <input type="text" id="taskName" style="width: 80%">
+    <br>
+    <label for="dueDate">Due Date:</label>
+    <input type="date" id="dueDate">
+    <br>
+    <button onclick="addTask()">Add Task</button>
+
+  <br><br>
+
+  <div id="taskList"></div>
+  <div id="taskSummary"></div>
+  <br><br>
+
+  <div>
+    <button onclick="displayNearestDueTask()">Find Nearest Due Task</button>
+    <button onclick="displayAverageTimeRemaining()">Calculate Average Time Remaining</button>
+    <button onclick="displaySortedTasks()">Sort Tasks by Due Date</button>
+  </div>
+  <br><br>
+
+  <div id="accordion">
+    <div class="card card-primary">
+      <div class="card-header">
+        <h4 class="card-title w-100">
+          <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+            Pending Tasks
+          </a>
+        </h4>
+      </div>
+      <div id="collapseOne" class="collapse show" data-parent="#accordion">
+        <div class="card-body" id="pendingTasksList"></div>
+      </div>
+    </div>
+
+    <div class="card card-success">
+      <div class="card-header">
+        <h4 class="card-title w-100">
+          <a class="d-block w-100" data-toggle="collapse" href="#collapseThree">
+            Completed Tasks
+          </a>
+        </h4>
+      </div>
+      <div id="collapseThree" class="collapse show" data-parent="#accordion">
+        <div class="card-body" id="completedTasksList"></div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="modal-info">
+    <div class="modal-dialog">
+      <div class="modal-content bg-info">
+        <div class="modal-header">
+          <h4 class="modal-title">Average Time!</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="modal-body-content">
+          <!-- Result will be displayed here -->
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+      <div class="modal fade" id="modal-success">
+        <div class="modal-dialog">
+          <div class="modal-content bg-success">
+            <div class="modal-header">
+              <h4 class="modal-title">Sort Tasks!</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+              
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+            </div>
+          </div>>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modal-danger">
+        <div class="modal-dialog">
+          <div class="modal-content bg-danger">
+            <div class="modal-header">
+              <h4 class="modal-title">Nearest Due</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+              
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  <!-- jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/demo.js"></script>
+
+
+  <script>
+    let tasks = [];
+
+    function addTask() {
+      const taskName = document.getElementById('taskName').value;
+      const dueDate = new Date(document.getElementById('dueDate').value);
+      if (taskName && dueDate) {
+        tasks.push({ name: taskName, dueDate: dueDate, status: 'pending' });
+        displayTaskLists();
+        displayTaskSummary();
+        document.getElementById('taskName').value = '';
+        document.getElementById('dueDate').value = '';
+      } else {
+        alert('Please enter both Task Name and Due Date.');
+      }
+    }
+    function toggleStatus(index) {
+      if (tasks[index].status === 'pending') {
+        tasks[index].status = 'completed';
+      } else {
+        tasks[index].status = 'pending';
+      }
+      displayTaskLists();
+      displayTaskSummary();
+    }
+
+    function generateTaskList(status) {
+      let taskListHTML = "<ul>";
+      tasks.forEach((task, index) => {
+        if (task.status === status) {
+          taskListHTML += `<li>${task.name} - Due: ${task.dueDate.toDateString()} - Status: ${task.status}
+          <button onclick="toggleStatus(${index})">Change Status</button></li>`;
+        }
+      });
+      taskListHTML += "</ul>";
+      return taskListHTML;
+    }
+
+    function findNearestDueTask(tasks) {
+      const pendingTasks = tasks.filter(task => task.status === 'pending');
+      if (pendingTasks.length > 0) {
+        return pendingTasks.reduce((nearest, task) => {
+          if (!nearest || task.dueDate < nearest.dueDate) {
+            return task;
+          }
+          return nearest;
+        });
+      } else {
+        return null;
+      }
+    }
+
+    function calculateAverageTimeRemaining(tasks) {
+      const pendingTasks = tasks.filter(task => task.status === 'pending');
+      if (pendingTasks.length > 0) {
+        const now = new Date();
+        const totalRemainingTime = pendingTasks.reduce((total, task) => {
+          const timeDiff = task.dueDate - now;
+          return total + timeDiff;
+        }, 0);
+        return totalRemainingTime / pendingTasks.length;
+      } else {
+        return NaN;
+      }
+    }
+
+    function sortTasksByDueDate(tasks) {
+      return tasks.slice().sort((a, b) => a.dueDate - b.dueDate);
+    }
+
+    function displayTaskLists() {
+      const pendingTasksList = document.getElementById('pendingTasksList');
+      const completedTasksList = document.getElementById('completedTasksList');
+      pendingTasksList.innerHTML = generateTaskList('pending');
+      completedTasksList.innerHTML = generateTaskList('completed');
+    }
+
+    function displayTaskSummary() {
+      const taskSummaryDiv = document.getElementById('taskSummary');
+      taskSummaryDiv.innerHTML = "<h3>Task Summary:</h3>";
+      taskSummaryDiv.innerHTML += `<i>Total number of tasks<i>: ${tasks.length}<br>`;
+      taskSummaryDiv.innerHTML += `<i>Number of pending tasks<i>: ${tasks.filter(task => task.status === 'pending').length}<br>`;
+    }
+
+
+  function displayNearestDueTask() {
+    const taskSummaryDiv = document.getElementById('modal-danger').querySelector('#modal-body-content');
+    const nearestTask = findNearestDueTask(tasks);
+    taskSummaryDiv.innerHTML = "<h3>Nearest task with due date:</h3>";
+    if (nearestTask) {
+      taskSummaryDiv.innerHTML += `Nearest task with due date: ${nearestTask.name} - Due: ${nearestTask.dueDate.toDateString()}`;
+    } else {
+      taskSummaryDiv.innerHTML += "No pending tasks found.";
+    }
+    $('#modal-danger').modal('show'); 
+  }
+
+    function displayAverageTimeRemaining() {
+      const taskSummaryDiv = document.getElementById('modal-body-content');
+      const averageRemainingTime = calculateAverageTimeRemaining(tasks);
+      taskSummaryDiv.innerHTML = "<h3>Average time remaining for pending tasks:</h3>";
+      if (!isNaN(averageRemainingTime) && isFinite(averageRemainingTime)) {
+        taskSummaryDiv.innerHTML += `Average time remaining for pending tasks: ${Math.round(averageRemainingTime / (1000 * 60 * 60 * 24))} days`;
+      } else {
+        taskSummaryDiv.innerHTML += "No pending tasks found.";
+      }
+      $('#modal-info').modal('show'); 
+    }
+
+  function displaySortedTasks() {
+    const taskSummaryDiv = document.getElementById('modal-success').querySelector('#modal-body-content');
+    const sortedTasks = sortTasksByDueDate(tasks);
+    taskSummaryDiv.innerHTML = "<h3>Sorted Tasks by Due Date:</h3><ul>";
+    sortedTasks.forEach(task => {
+      taskSummaryDiv.innerHTML += `<li>${task.name} - Due: ${task.dueDate.toDateString()} - Status: ${task.status}</li>`;
+    });
+    taskSummaryDiv.innerHTML += "</ul>";
+    $('#modal-success').modal('show'); 
+  }
+
+
+
+    displayTaskLists();
+    displayTaskSummary();
+  </script>
+</body>
+</html>

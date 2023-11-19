@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Letter Position | Question 1 Longboan - Rodriguez</title>
+    <style>
+        body {
+            text-align: center; /* Center-align the content on the page */
+        }
+    </style>
+</head>
+<body>
+    <label>Enter a sentence:</label> <!-- Label for the sentence input field -->
+    <input id="sentence" type="text" style="width: 30%;"> <!-- Input field for the sentence -->
+    <button onclick="showChooseLetter()">Submit</button> <!-- Button to submit the sentence -->
+    <br>
+    <br>
+    <div id="chooseLetter" style="display: none;"> <!-- Hidden section for letter input, magpapakita lang kung yung Submit is clicked -->
+        <label>Enter a letter to find:</label> <!-- Label for the letter input field -->
+        <input id="letter" type="text"> <!-- Input field for the letter -->
+        <br>
+        <br>
+        <button onclick="letterPos()">Find Position</button> <!-- Button to find letter positions -->
+        <br>
+        <br>
+        <label>Result:</label> <!-- Label for the result -->
+        <p id="result"></p> <!-- Paragraph element to display the result -->
+    </div>
+</body>
+</html>
+<script>
+    // Function to show the letter input section, ipapakita nito yung nasa div na chooseLetter
+    function showChooseLetter() {
+        document.getElementById("chooseLetter").style.display = "block";
+    }
+
+    // Function to convert a number to its ordinal form
+    // Kung need mo ng recap ordinal numbers a number defining a thing's position in a series, such as “first,” “second,” or “third.”
+    function ordinal(number) {
+        // The conditions:
+        // number % 10 == 1 checks if the number ends in 1.
+        // number % 10 == 2 checks if the number ends in 2.
+        // number % 10 == 3 checks if the number ends in 3.
+        // number % 100 != 11, != 12, and != 13 ensures that numbers 11, 12, and 13 are treated as "th"
+        // since yung 11, 12, at 13 ay nag-eend sa "th" sa tenths.
+        // at yung mga nasa ibang numbers ending 1,2,3 like 21, 22, at 23 and so on ay 21st, 22nd, 23rd etc.
+        if (number % 10 == 1 && number % 100 != 11) { 
+            return number + "st"; 
+        } else if (number % 10 == 2 && number % 100 != 12) {
+            return number + "nd";
+        } else if (number % 10 == 3 && number % 100 != 13) {
+            return number + "rd";
+        } else {
+            return number + "th";
+        }
+    }
+
+    // Function to find the positions of a letter in a sentence
+    function letterPos() {
+        // Get user input for the sentence and letter and declaring them
+        let sentence = document.getElementById("sentence").value;
+        let letter = document.getElementById("letter").value;
+
+        // Validate natin yung user input
+        if (sentence.length == 0 || letter.length != 1) {
+            alert("Enter a valid sentence and a single letter");
+            return;
+        }
+
+        // Convert input to lowercase for case-insensitive search para kung maghahanap ng letter is considered yung mga capitalized
+        sentence = sentence.toLowerCase();
+        letter = letter.toLowerCase();
+
+        // Initialize an array to store positions
+        let position = [];
+
+        // Loop through the sentence to find letter positions
+        for (let index = 0; index < sentence.length; index++) {
+            if (sentence[index] == letter) {
+                position.push(ordinal(index + 1)); // Convert the position to an ordinal and add to the array
+            }
+        }
+
+        // Update the result in our HTML
+        // If wala siyang nahanap na position, this will show kasi wala naman yung letter na nilagay sa sentence
+        if (position.length == 0) {
+            document.getElementById("result").innerHTML = "The letter " + letter + " was not found in the given sentence.";
+        // If yung letter is nasa 1st lang at wala nang katuloy, para hindi ma-print yung comma
+        } else if (position.length == 1) {
+            document.getElementById("result").innerHTML = "The letter " + letter + " was found at the " + position + " position";
+        // This will display all the positions that is in our array
+        } else {
+            document.getElementById("result").innerHTML = "The letter " + letter + " was found at the " + position.join(", ") + " position";
+        }
+    }
+</script>

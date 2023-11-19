@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smooth Sentence? | Question 3 Longboan - Rodriguez</title> <!-- Title nung HTML -->
+    <style>
+        body {
+            text-align: center; /* CSS style to center align text within the body */
+        }
+    </style>
+</head>
+<body>
+    <h2>Enter a sentence to check if it's a smooth sentence:</h2> <!-- Heading text -->
+    <br>
+    <input id="sentence" type="text" placeholder="Enter a sentence" style="width: 50%;"> <!-- Text input for entering a sentence -->
+    <br>
+    <br>
+    <button onclick="checkSmooth()">Smooth or Not?</button> <!-- Button element that triggers the 'checkSmooth' function when clicked -->
+    <br>
+    <br>
+    <p id="result"></p> <!-- Paragraph element where the result of the check will be displayed -->
+</body>
+</html>
+<script>
+    function isSmooth(sentence) {
+        // Marta appreciated deep perpendicular right trapezoids
+        // 
+        // She eats super righteously
+        sentence = sentence.toLowerCase(); // Convert the sentence to lowercase for case insensitivity
+        const words = sentence.split(" "); // Split the sentence into an array of words based on spaces
+        
+        for (let index = 0; index < words.length - 1; index++) {
+            const currentLastLetter = words[index].slice(-1); // Get the last letter of the current word, ginamit natin -1 para sa last element
+            const nextFirstLetter = words[index + 1][0]; // Get the first letter of the next word, 0 naman kasi first element
+
+            if (currentLastLetter !== nextFirstLetter) {
+                return false; // If the last letter of the current word doesn't match the first letter of the next word, the sentence is not smooth
+            }
+        }
+
+        return true; // If the loop doesn't find any issues, the sentence is smooth
+    }
+
+    function checkSmooth() {
+        let sentence = document.getElementById("sentence").value; // Get the value entered in the text input
+
+        if (sentence === "") {
+            document.getElementById("result").innerHTML = "The sentence is empty!"; // Displays this message if the input is empty
+        } else if (sentence.split(" ").length === 1) {
+            document.getElementById("result").innerHTML = "The sentence is one word!"; // Displays this message if the input contains only one word
+        } else {
+            let isSmoothResult = isSmooth(sentence); // Call the 'isSmooth' function to check if the sentence is smooth
+            if (isSmoothResult) {
+                document.getElementById("result").innerHTML = "True! The sentence entered is a smooth sentence."; // Display a message if the sentence is smooth
+            } else {
+                document.getElementById("result").innerHTML = "False! The sentence entered is not a smooth sentence."; // Display a message if the sentence is not smooth
+            }
+        }
+    }
+</script>

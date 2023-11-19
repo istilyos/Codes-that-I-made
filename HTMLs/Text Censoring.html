@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Censoring | Question 2 Longboan - Rodriguez</title>
+    <style>
+        body {
+            text-align: center; /* Center-align the content on the page */
+        }
+    </style>
+</head>
+<body>
+    <label>Enter a text:</label> <!-- Input field for entering the initial text -->
+    <input id="text" type="text">
+    <button onclick="showWord()">Submit</button> <!-- Button to submit the text for censorship -->
+    <br><br>
+    <div id="chooseWord" style="display: none;"> <!-- Hidden section for word censorship input -->
+        <label>Enter a word to be censored:</label>
+        <input id="word" type="text"> <!-- Input field for entering the word to be censored -->
+        <button onclick="censor()">Censor</button> <!-- Button to initiate the censorship process -->
+        <br>
+        <br>
+        <label>Censored Text:</label> <!-- Display the censored text result -->
+        <p id="result"></p>
+    </div>
+</body>
+</html>
+<script>
+   function showWord() {
+        // This function is called when the "Submit" button is clicked.
+        // It changes the display property of the "chooseWord" div to "block", making it visible.
+        document.getElementById("chooseWord").style.display = "block";
+   }
+
+   function censor() {
+        // This function is called when the "Censor" button is clicked.
+        // We retrieve and declare the values of the "word" and "text" input fields.
+        let word = document.getElementById("word").value;
+        let text = document.getElementById("text").value;
+
+        // Create a string of asterisks with the same length as the word
+        let censored = "*".repeat(word.length);
+
+        // Split the text into an array of words using spaces as separators
+        let words = text.split(" "); 
+
+        // Iterate through the words and replace the word if it matches the provided word
+        for (let index = 0; index < words.length; index++) {
+            if (words[index] === word) {
+                words[index] = censored;
+            }
+        }
+
+        // Join the words back together with spaces to form the censored text
+        let result = words.join(" ");
+
+        // Set the innerHTML of the "result" paragraph to display the censored text
+        document.getElementById("result").innerHTML = result;
+   }
+</script>

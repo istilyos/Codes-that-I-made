@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Long Weekend Activity NUMBER 3</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: cornsilk;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: Arial;
+        }
+
+        .add-books-container {
+            background-color: lavender;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-container {
+            background-color: papayawhip;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-container input[type="text"],
+        .search-container button,
+        .search-container select{
+            padding: 8px;
+            margin: 8px;
+        }
+
+        .add-books-container input[type="text"],
+        .add-books-container input[type="number"],
+        .add-books-container button {
+            padding: 8px;
+            margin: 8px;
+        }
+
+        .book {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            justify-content: space-between;
+        }
+
+        .book p {
+            margin: 5px 0;
+        }
+
+        .inventory-total {
+            font-weight: bold;
+        }
+
+        .book button {
+            padding: 8px 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .book .edit {
+            background-color: #4CAF50;
+            text-align: center;
+            color: white;
+            padding: 8px 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5%;
+            width: 40%;
+        }
+
+        .book .remove {
+            background-color: #f44336;
+            text-align: center;
+            color: white;
+            padding: 8px 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            
+            margin: 0 auto;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bookstore ni Mang Juan</h1>
+
+    <div class="search-container">
+        <label for="searchInput">Search by:</label>
+        <select id="searchCriteria">
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+            <option value="genre">Genre</option>
+        </select>
+        <input type="text" id="searchInput" style="width: 40%;">
+        <button onclick="searchBooks()" class="btn btn-success" style="width: 10%">Search</button>
+    </div>
+
+    <div class="add-books-container">
+        <b><label for="title">Title:</label></b>
+        <input type="text" id="title" style="width: 50%;">
+        <br><br>
+        <b><label for="author">Author:</label></b>
+        <input type="text" id="author" style="width: 30%;"></b>
+        <br><br>
+        <b><label for="genre">Genre:</label></b>
+        <input type="text" id="genre">
+        <br><br>
+        <b><label for="price">Price:</label></b>
+        <input type="number" id="price">
+        <br><br>
+        <button onclick="addBook()" type="button" class="btn btn-success" style="width: 50%;">Add Book</button>
+        <br><br>
+    </div>
+
+    <div class="inventory-total">
+        <p>Total Inventory Value: ₱<span id="totalValue">0</span></p>
+        <p>Number of Books: <span id="bookCount">0</span></p>
+    </div>
+    
+    <h2 style="text-align: center; color: cadetblue;">Books in the Inventory</h2>
+
+    <div id="bookList">
+    
+    </div>
+
+
+      <div class="modal fade" id="modal-success">
+        <div class="modal-dialog">
+          <div class="modal-content bg-success">
+            <div class="modal-header">
+              <h4 class="modal-title">Success!</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Book Added Successfully&hellip;</p>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+            </div>
+          </div>>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modal-danger">
+        <div class="modal-dialog">
+          <div class="modal-content bg-danger">
+            <div class="modal-header">
+              <h4 class="modal-title">Removed!</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Book Removed from Inventory&hellip;</p>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/demo.js"></script>
+</body>
+</html>
+<script>
+    
+
+let books = [];
+
+function Book(title, author, genre, price) {
+    this.title = title;
+    this.author = author;
+    this.genre = genre;
+    this.price = price;
+}
+
+function addBook() {
+    const title = document.getElementById('title').value;
+    const author = document.getElementById('author').value;
+    const genre = document.getElementById('genre').value;
+    const price = parseFloat(document.getElementById('price').value);
+
+    if (isNaN(price) || price <= 0) {
+        alert('Please enter a valid price for the book.');
+        return;
+    } else {
+        $('#modal-success').modal('show');
+        
+        const newBook = new Book(title, author, genre, price);
+        books.push(newBook);
+    
+        displayBooks(books);
+        updateBookCount();
+        calculateTotalValue();
+        clear();
+    }
+}
+
+function searchBooks() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
+    const searchCriteria = document.getElementById('searchCriteria').value;
+
+    if (searchInput === '') {
+        alert('Please enter a search term.');
+    } else {
+        const filteredBooks = books.filter(book =>
+            book[searchCriteria].toLowerCase().includes(searchInput)
+        );
+
+        if (filteredBooks.length === 0) {
+            alert('No matching books found.');
+        } else {
+            let searchedBooks = 'Matching Books:\n';
+            filteredBooks.forEach(book => {
+                searchedBooks += `Title: ${book.title}\nAuthor: ${book.author}\nGenre: ${book.genre}\nPrice: ₱${book.price}\n\n`;
+            });
+            alert(searchedBooks);
+        }
+    }
+    clearSearch();
+}
+
+function displayBooks(booksArray) {
+    const bookList = document.getElementById('bookList');
+    bookList.innerHTML = '';
+
+    booksArray.forEach((book, index) => {
+        const bookItem = document.createElement('div');
+        bookItem.classList.add('book');
+
+        bookItem.innerHTML = `<p>Title: ${book.title}</p>
+                              <p>Author: ${book.author}</p>
+                              <p>Genre: ${book.genre}</p>
+                              <p>Price: ₱${book.price}</p>
+                              <button class="edit" onclick="editBook(${index})">Edit</button> 
+                              <button class="remove" data-toggle="modal" data-target="#modal-danger" onclick="removeBook(${index})">Remove</button>`
+
+                              
+        bookList.appendChild(bookItem);
+    });
+}
+
+function editBook(index) {
+        const bookToEdit = books[index];
+        const newTitle = prompt('Enter the new title:', bookToEdit.title);
+        const newAuthor = prompt('Enter the new author:', bookToEdit.author);
+        const newGenre = prompt('Enter the new genre:', bookToEdit.genre);
+        const newPrice = parseFloat(prompt('Enter the new price:', bookToEdit.price));
+
+        if (newTitle && newAuthor && newGenre && !isNaN(newPrice)) {
+            books[index] = new Book(newTitle, newAuthor, newGenre, newPrice);
+            displayBooks(books);
+            calculateTotalValue();
+        } else {
+            alert('Invalid input. Book details not updated.');
+        }
+    }
+
+function removeBook(index) {
+    books.splice(index, 1);
+    displayBooks(books);
+    calculateTotalValue();
+    updateBookCount();
+}    
+
+function clear(){
+    const title = document.getElementById('title').value = "";
+    const author = document.getElementById('author').value = "";
+    const genre = document.getElementById('genre').value = "";
+    const price = parseFloat(document.getElementById('price').value = "");
+}
+
+function clearSearch(){
+        const searchInput = document.getElementById('searchInput').value = "";
+    }
+    
+function updateBookCount() {
+    const bookCount = books.length;
+    document.getElementById('bookCount').innerText = bookCount;
+}
+
+function calculateTotalValue() {
+    const totalValue = books.reduce((total, book) => total + book.price, 0);
+    document.getElementById('totalValue').innerText = totalValue.toFixed(2);
+}
+
+</script>
